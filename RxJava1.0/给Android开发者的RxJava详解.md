@@ -153,7 +153,7 @@ onError(): 事件队列异常。在事件处理过程中出异常时，onError()
 在一个正确运行的事件序列中, onCompleted() 和 onError() 有且只有一个，并且是事件序列中的最后一个。需要注意的是，onCompleted() 和 onError() 二者也是互斥的，即在队列中调用了其中一个，就不应该再调用另一个。
 RxJava 的观察者模式大致如下图：
 
-![RxJava](images/RxJava_04.png)
+![RxJava](images/RxJava_04.jpg)
 
 ## 3.2 基本实现
 
