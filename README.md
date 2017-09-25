@@ -27,3 +27,12 @@ https://www.gitbook.com/book/alleniverson/rxdocs/welcome
 * [给初学者的RxJava2.0教程-7](RxJava2.0/给初学者的RxJava2.0教程-7.md)
 * [给初学者的RxJava2.0教程-8](RxJava2.0/给初学者的RxJava2.0教程-8.md)
 * [给初学者的RxJava2.0教程-9](RxJava2.0/给初学者的RxJava2.0教程-9.md)
+
+## 关注我
+
+- Email：<619888095@qq.com>
+- CSDN博客：[Allen Iverson](http://blog.csdn.net/axi295309066)
+- 新浪微博：[AndroidDeveloper](http://weibo.com/u/1848214604?topnav=1&wvr=6&topsug=1&is_all=1)
+- GitHub：[JackChan1999](https://github.com/JackChan1999)
+- GitBook：[alleniverson](https://www.gitbook.com/@alleniverson)
+- 个人博客：[JackChan](https://jackchan1999.github.io/)
