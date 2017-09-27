@@ -24,7 +24,6 @@ Flowable.create(new FlowableOnSubscribe<Integer>() {
         }, BackpressureStrategy.ERROR).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -91,37 +90,36 @@ long requested();
 
 ```java
 public static void demo1() {
-       Flowable
-               .create(new FlowableOnSubscribe<Integer>() {
-                   @Override
-                   public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
-                       Log.d(TAG, "current requested: " + emitter.requested());
-                   }
-               }, BackpressureStrategy.ERROR)
-               .subscribe(new Subscriber<Integer>() {
+    
+    Flowable.create(new FlowableOnSubscribe<Integer>() {
+               @Override
+               public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
+                   Log.d(TAG, "current requested: " + emitter.requested());
+               }
+           }, BackpressureStrategy.ERROR)
+           .subscribe(new Subscriber<Integer>() {
+               @Override
+               public void onSubscribe(Subscription s) {
+                   Log.d(TAG, "onSubscribe");
+                   mSubscription = s;
+               }
 
-                   @Override
-                   public void onSubscribe(Subscription s) {
-                       Log.d(TAG, "onSubscribe");
-                       mSubscription = s;
-                   }
+               @Override
+               public void onNext(Integer integer) {
+                   Log.d(TAG, "onNext: " + integer);
+               }
 
-                   @Override
-                   public void onNext(Integer integer) {
-                       Log.d(TAG, "onNext: " + integer);
-                   }
+               @Override
+               public void onError(Throwable t) {
+                   Log.w(TAG, "onError: ", t);
+               }
 
-                   @Override
-                   public void onError(Throwable t) {
-                       Log.w(TAG, "onError: ", t);
-                   }
-
-                   @Override
-                   public void onComplete() {
-                       Log.d(TAG, "onComplete");
-                   }
-               });
-   }
+               @Override
+               public void onComplete() {
+                   Log.d(TAG, "onComplete");
+               }
+           });
+}
 ```
 
 这个例子中，我们在上游中打印出当前的request数量，下游什么也不做。
@@ -141,38 +139,37 @@ D/TAG: current requested: 0
 
 ```java
 public static void demo1() {
-       Flowable
-               .create(new FlowableOnSubscribe<Integer>() {
-                   @Override
-                   public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
-                       Log.d(TAG, "current requested: " + emitter.requested());
-                   }
-               }, BackpressureStrategy.ERROR)
-               .subscribe(new Subscriber<Integer>() {
+    
+    Flowable.create(new FlowableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
+                    Log.d(TAG, "current requested: " + emitter.requested());
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribe(new Subscriber<Integer>() {
+                @Override
+                public void onSubscribe(Subscription s) {
+                    Log.d(TAG, "onSubscribe");
+                    mSubscription = s;
+                    s.request(10); //我要打十个！
+                }
 
-                   @Override
-                   public void onSubscribe(Subscription s) {
-                       Log.d(TAG, "onSubscribe");
-                       mSubscription = s;
-                       s.request(10); //我要打十个！
-                   }
+                @Override
+                public void onNext(Integer integer) {
+                    Log.d(TAG, "onNext: " + integer);
+                }
 
-                   @Override
-                   public void onNext(Integer integer) {
-                       Log.d(TAG, "onNext: " + integer);
-                   }
+                @Override
+                public void onError(Throwable t) {
+                    Log.w(TAG, "onError: ", t);
+                }
 
-                   @Override
-                   public void onError(Throwable t) {
-                       Log.w(TAG, "onError: ", t);
-                   }
-
-                   @Override
-                   public void onComplete() {
-                       Log.d(TAG, "onComplete");
-                   }
-               });
-   }
+                @Override
+                public void onComplete() {
+                    Log.d(TAG, "onComplete");
+                }
+            });
+}
 ```
 
 这次在下游中调用了request(10)，告诉上游我要打十个，看看运行结果：
@@ -186,39 +183,39 @@ D/TAG: current requested: 10
 
 ```java
 public static void demo1() {
-        Flowable
-                .create(new FlowableOnSubscribe<Integer>() {
-                    @Override
-                    public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
-                        Log.d(TAG, "current requested: " + emitter.requested());
-                    }
-                }, BackpressureStrategy.ERROR)
-                .subscribe(new Subscriber<Integer>() {
+    
+    Flowable.create(new FlowableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
+                    Log.d(TAG, "current requested: " + emitter.requested());
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribe(new Subscriber<Integer>() {
 
-                    @Override
-                    public void onSubscribe(Subscription s) {
-                        Log.d(TAG, "onSubscribe");
-                        mSubscription = s;
-                        s.request(10);  //我要打十个!
-                        s.request(100); //再给我一百个！
-                    }
+                @Override
+                public void onSubscribe(Subscription s) {
+                    Log.d(TAG, "onSubscribe");
+                    mSubscription = s;
+                    s.request(10);  //我要打十个!
+                    s.request(100); //再给我一百个！
+                }
 
-                    @Override
-                    public void onNext(Integer integer) {
-                        Log.d(TAG, "onNext: " + integer);
-                    }
+                @Override
+                public void onNext(Integer integer) {
+                    Log.d(TAG, "onNext: " + integer);
+                }
 
-                    @Override
-                    public void onError(Throwable t) {
-                        Log.w(TAG, "onError: ", t);
-                    }
+                @Override
+                public void onError(Throwable t) {
+                    Log.w(TAG, "onError: ", t);
+                }
 
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete");
-                    }
-                });
-    }
+                @Override
+                public void onComplete() {
+                    Log.d(TAG, "onComplete");
+                }
+            });
+}
 ```
 
 下游先调用了request(10), 然后又调用了request(100)，来看看运行结果：
@@ -238,55 +235,55 @@ D/TAG: current requested: 110
 
 ```java
 public static void demo2() {
-       Flowable
-               .create(new FlowableOnSubscribe<Integer>() {
-                   @Override
-                   public void subscribe(final FlowableEmitter<Integer> emitter) throws Exception {
-                       Log.d(TAG, "before emit, requested = " + emitter.requested());
+    
+     Flowable.create(new FlowableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(final FlowableEmitter<Integer> emitter) throws Exception {
+                    Log.d(TAG, "before emit, requested = " + emitter.requested());
 
-                       Log.d(TAG, "emit 1");
-                       emitter.onNext(1);
-                       Log.d(TAG, "after emit 1, requested = " + emitter.requested());
+                    Log.d(TAG, "emit 1");
+                    emitter.onNext(1);
+                    Log.d(TAG, "after emit 1, requested = " + emitter.requested());
 
-                       Log.d(TAG, "emit 2");
-                       emitter.onNext(2);
-                       Log.d(TAG, "after emit 2, requested = " + emitter.requested());
+                    Log.d(TAG, "emit 2");
+                    emitter.onNext(2);
+                    Log.d(TAG, "after emit 2, requested = " + emitter.requested());
 
-                       Log.d(TAG, "emit 3");
-                       emitter.onNext(3);
-                       Log.d(TAG, "after emit 3, requested = " + emitter.requested());
+                    Log.d(TAG, "emit 3");
+                    emitter.onNext(3);
+                    Log.d(TAG, "after emit 3, requested = " + emitter.requested());
 
-                       Log.d(TAG, "emit complete");
-                       emitter.onComplete();
+                    Log.d(TAG, "emit complete");
+                    emitter.onComplete();
 
-                       Log.d(TAG, "after emit complete, requested = " + emitter.requested());
-                   }
-               }, BackpressureStrategy.ERROR)
-               .subscribe(new Subscriber<Integer>() {
+                    Log.d(TAG, "after emit complete, requested = " + emitter.requested());
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribe(new Subscriber<Integer>() {
 
-                   @Override
-                   public void onSubscribe(Subscription s) {
-                       Log.d(TAG, "onSubscribe");
-                       mSubscription = s;
-                       s.request(10);  //request 10
-                   }
+                @Override
+                public void onSubscribe(Subscription s) {
+                    Log.d(TAG, "onSubscribe");
+                    mSubscription = s;
+                    s.request(10);  //request 10
+                }
 
-                   @Override
-                   public void onNext(Integer integer) {
-                       Log.d(TAG, "onNext: " + integer);
-                   }
+                @Override
+                public void onNext(Integer integer) {
+                    Log.d(TAG, "onNext: " + integer);
+                }
 
-                   @Override
-                   public void onError(Throwable t) {
-                       Log.w(TAG, "onError: ", t);
-                   }
+                @Override
+                public void onError(Throwable t) {
+                    Log.w(TAG, "onError: ", t);
+                }
 
-                   @Override
-                   public void onComplete() {
-                       Log.d(TAG, "onComplete");
-                   }
-               });
-   }
+                @Override
+                public void onComplete() {
+                    Log.d(TAG, "onComplete");
+                }
+            });
+}
 ```
 
 代码很简单，来看看运行结果：
@@ -312,55 +309,55 @@ D/TAG: after emit complete, requested = 7
 
 ```java
 public static void demo2() {
-        Flowable
-                .create(new FlowableOnSubscribe<Integer>() {
-                    @Override
-                    public void subscribe(final FlowableEmitter<Integer> emitter) throws Exception {
-                        Log.d(TAG, "before emit, requested = " + emitter.requested());
+    
+    Flowable.create(new FlowableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(final FlowableEmitter<Integer> emitter) throws Exception {
+                    Log.d(TAG, "before emit, requested = " + emitter.requested());
 
-                        Log.d(TAG, "emit 1");
-                        emitter.onNext(1);
-                        Log.d(TAG, "after emit 1, requested = " + emitter.requested());
+                    Log.d(TAG, "emit 1");
+                    emitter.onNext(1);
+                    Log.d(TAG, "after emit 1, requested = " + emitter.requested());
 
-                        Log.d(TAG, "emit 2");
-                        emitter.onNext(2);
-                        Log.d(TAG, "after emit 2, requested = " + emitter.requested());
+                    Log.d(TAG, "emit 2");
+                    emitter.onNext(2);
+                    Log.d(TAG, "after emit 2, requested = " + emitter.requested());
 
-                        Log.d(TAG, "emit 3");
-                        emitter.onNext(3);
-                        Log.d(TAG, "after emit 3, requested = " + emitter.requested());
+                    Log.d(TAG, "emit 3");
+                    emitter.onNext(3);
+                    Log.d(TAG, "after emit 3, requested = " + emitter.requested());
 
-                        Log.d(TAG, "emit complete");
-                        emitter.onComplete();
+                    Log.d(TAG, "emit complete");
+                    emitter.onComplete();
 
-                        Log.d(TAG, "after emit complete, requested = " + emitter.requested());
-                    }
-                }, BackpressureStrategy.ERROR)
-                .subscribe(new Subscriber<Integer>() {
+                    Log.d(TAG, "after emit complete, requested = " + emitter.requested());
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribe(new Subscriber<Integer>() {
 
-                    @Override
-                    public void onSubscribe(Subscription s) {
-                        Log.d(TAG, "onSubscribe");
-                        mSubscription = s;
-                        s.request(2);   //request 2
-                    }
+                @Override
+                public void onSubscribe(Subscription s) {
+                    Log.d(TAG, "onSubscribe");
+                    mSubscription = s;
+                    s.request(2);   //request 2
+                }
 
-                    @Override
-                    public void onNext(Integer integer) {
-                        Log.d(TAG, "onNext: " + integer);
-                    }
+                @Override
+                public void onNext(Integer integer) {
+                    Log.d(TAG, "onNext: " + integer);
+                }
 
-                    @Override
-                    public void onError(Throwable t) {
-                        Log.w(TAG, "onError: ", t);
-                    }
+                @Override
+                public void onError(Throwable t) {
+                    Log.w(TAG, "onError: ", t);
+                }
 
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete");
-                    }
-                });
-    }
+                @Override
+                public void onComplete() {
+                    Log.d(TAG, "onComplete");
+                }
+            });
+}
 ```
 
 还是这个例子，只不过这次只request(2), 看看运行结果：
@@ -410,39 +407,39 @@ public static void demo2() {
 
 ```java
 public static void demo3() {
-        Flowable
-                .create(new FlowableOnSubscribe<Integer>() {
-                    @Override
-                    public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
-                        Log.d(TAG, "current requested: " + emitter.requested());
-                    }
-                }, BackpressureStrategy.ERROR)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Integer>() {
+    
+    Flowable.create(new FlowableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
+                    Log.d(TAG, "current requested: " + emitter.requested());
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<Integer>() {
 
-                    @Override
-                    public void onSubscribe(Subscription s) {
-                        Log.d(TAG, "onSubscribe");
-                        mSubscription = s;
-                    }
+                @Override
+                public void onSubscribe(Subscription s) {
+                    Log.d(TAG, "onSubscribe");
+                    mSubscription = s;
+                }
 
-                    @Override
-                    public void onNext(Integer integer) {
-                        Log.d(TAG, "onNext: " + integer);
-                    }
+                @Override
+                public void onNext(Integer integer) {
+                    Log.d(TAG, "onNext: " + integer);
+                }
 
-                    @Override
-                    public void onError(Throwable t) {
-                        Log.w(TAG, "onError: ", t);
-                    }
+                @Override
+                public void onError(Throwable t) {
+                    Log.w(TAG, "onError: ", t);
+                }
 
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete");
-                    }
-                });
-    }
+                @Override
+                public void onComplete() {
+                    Log.d(TAG, "onComplete");
+                }
+            });
+}
 ```
 
 这次是异步的情况，上游啥也不做，下游也啥也不做，来看看运行结果：
@@ -458,40 +455,40 @@ D/TAG: current requested: 128
 
 ```java
 public static void demo3() {
-       Flowable
-               .create(new FlowableOnSubscribe<Integer>() {
-                   @Override
-                   public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
-                       Log.d(TAG, "current requested: " + emitter.requested());
-                   }
-               }, BackpressureStrategy.ERROR)
-               .subscribeOn(Schedulers.io())
-               .observeOn(AndroidSchedulers.mainThread())
-               .subscribe(new Subscriber<Integer>() {
+    
+    Flowable.create(new FlowableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
+                    Log.d(TAG, "current requested: " + emitter.requested());
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<Integer>() {
 
-                   @Override
-                   public void onSubscribe(Subscription s) {
-                       Log.d(TAG, "onSubscribe");
-                       mSubscription = s;
-                       s.request(1000); //我要打1000个！！
-                   }
+                @Override
+                public void onSubscribe(Subscription s) {
+                    Log.d(TAG, "onSubscribe");
+                    mSubscription = s;
+                    s.request(1000); //我要打1000个！！
+                }
 
-                   @Override
-                   public void onNext(Integer integer) {
-                       Log.d(TAG, "onNext: " + integer);
-                   }
+                @Override
+                public void onNext(Integer integer) {
+                    Log.d(TAG, "onNext: " + integer);
+                }
 
-                   @Override
-                   public void onError(Throwable t) {
-                       Log.w(TAG, "onError: ", t);
-                   }
+                @Override
+                public void onError(Throwable t) {
+                    Log.w(TAG, "onError: ", t);
+                }
 
-                   @Override
-                   public void onComplete() {
-                       Log.d(TAG, "onComplete");
-                   }
-               });
-   }
+                @Override
+                public void onComplete() {
+                    Log.d(TAG, "onComplete");
+                }
+            });
+}
 ```
 
 这次我们在下游调用了request（1000）告诉上游我要打1000个，按照之前我们说的，这次的运行结果应该是1000，来看看运行结果：
@@ -524,56 +521,56 @@ D/TAG: current requested: 128
 带着这个疑问我们来看下一段代码：
 
 ```java
- public static void request() {
-        mSubscription.request(96); //请求96个事件
-    }
+public static void request() {
+       mSubscription.request(96); //请求96个事件
+}
 
 public static void demo4() {
-        Flowable
-                .create(new FlowableOnSubscribe<Integer>() {
-                    @Override
-                    public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
-                        Log.d(TAG, "First requested = " + emitter.requested());
-                        boolean flag;
-                        for (int i = 0; ; i++) {
-                            flag = false;
-                            while (emitter.requested() == 0) {
-                                if (!flag) {
-                                    Log.d(TAG, "Oh no! I can't emit value!");
-                                    flag = true;
-                                }
+    
+    Flowable.create(new FlowableOnSubscribe<Integer>() {
+                @Override
+                public void subscribe(FlowableEmitter<Integer> emitter) throws Exception {
+                    Log.d(TAG, "First requested = " + emitter.requested());
+                    boolean flag;
+                    for (int i = 0; ; i++) {
+                        flag = false;
+                        while (emitter.requested() == 0) {
+                            if (!flag) {
+                                Log.d(TAG, "Oh no! I can't emit value!");
+                                flag = true;
                             }
-                            emitter.onNext(i);
-                            Log.d(TAG, "emit " + i + " , requested = " + emitter.requested());
                         }
+                        emitter.onNext(i);
+                        Log.d(TAG, "emit " + i + " , requested = " + emitter.requested());
                     }
-                }, BackpressureStrategy.ERROR)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Integer>() {
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<Integer>() {
 
-                    @Override
-                    public void onSubscribe(Subscription s) {
-                        Log.d(TAG, "onSubscribe");
-                        mSubscription = s;
-                    }
+                @Override
+                public void onSubscribe(Subscription s) {
+                    Log.d(TAG, "onSubscribe");
+                    mSubscription = s;
+                }
 
-                    @Override
-                    public void onNext(Integer integer) {
-                        Log.d(TAG, "onNext: " + integer);
-                    }
+                @Override
+                public void onNext(Integer integer) {
+                    Log.d(TAG, "onNext: " + integer);
+                }
 
-                    @Override
-                    public void onError(Throwable t) {
-                        Log.w(TAG, "onError: ", t);
-                    }
+                @Override
+                public void onError(Throwable t) {
+                    Log.w(TAG, "onError: ", t);
+                }
 
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "onComplete");
-                    }
-                });
-    }
+                @Override
+                public void onComplete() {
+                    Log.d(TAG, "onComplete");
+                }
+            });
+}
 ```
 
 这次的上游稍微复杂了一点点，首先仍然是个无限循环发事件，但是是有条件的，只有当上游的requested != 0的时候才会发事件，然后我们调用request（96）去消费96个事件（为什么是96而不是其他的数字先不要管），来看看运行结果吧：
@@ -633,74 +630,74 @@ D/TAG: Oh no! I can't emit value!
 
 ```java
 public static void main(String[] args) {
-       practice1();
-       try {
-           Thread.sleep(10000000);
-       } catch (InterruptedException e) {
-           e.printStackTrace();
-       }
-   }
+    practice1();
+    try {
+        Thread.sleep(10000000);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+}
 
-   public static void practice1() {
-       Flowable
-               .create(new FlowableOnSubscribe<String>() {
-                   @Override
-                   public void subscribe(FlowableEmitter<String> emitter) throws Exception {
-                       try {
-                           FileReader reader = new FileReader("test.txt");
-                           BufferedReader br = new BufferedReader(reader);
+public static void practice1() {
+    
+     Flowable.create(new FlowableOnSubscribe<String>() {
+                @Override
+                public void subscribe(FlowableEmitter<String> emitter) throws Exception {
+                    try {
+                        FileReader reader = new FileReader("test.txt");
+                        BufferedReader br = new BufferedReader(reader);
 
-                           String str;
+                        String str;
 
-                           while ((str = br.readLine()) != null && !emitter.isCancelled()) {
-                               while (emitter.requested() == 0) {
-                                   if (emitter.isCancelled()) {
-                                       break;
-                                   }
-                               }
-                               emitter.onNext(str);
-                           }
+                        while ((str = br.readLine()) != null && !emitter.isCancelled()) {
+                            while (emitter.requested() == 0) {
+                                if (emitter.isCancelled()) {
+                                    break;
+                                }
+                            }
+                            emitter.onNext(str);
+                        }
 
-                           br.close();
-                           reader.close();
+                        br.close();
+                        reader.close();
 
-                           emitter.onComplete();
-                       } catch (Exception e) {
-                           emitter.onError(e);
-                       }
-                   }
-               }, BackpressureStrategy.ERROR)
-               .subscribeOn(Schedulers.io())
-               .observeOn(Schedulers.newThread())
-               .subscribe(new Subscriber<String>() {
+                        emitter.onComplete();
+                    } catch (Exception e) {
+                        emitter.onError(e);
+                    }
+                }
+            }, BackpressureStrategy.ERROR)
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.newThread())
+            .subscribe(new Subscriber<String>() {
 
-                   @Override
-                   public void onSubscribe(Subscription s) {
-                       mSubscription = s;
-                       s.request(1);
-                   }
+                @Override
+                public void onSubscribe(Subscription s) {
+                    mSubscription = s;
+                    s.request(1);
+                }
 
-                   @Override
-                   public void onNext(String string) {
-                       System.out.println(string);
-                       try {
-                           Thread.sleep(2000);
-                           mSubscription.request(1);
-                       } catch (InterruptedException e) {
-                           e.printStackTrace();
-                       }
-                   }
+                @Override
+                public void onNext(String string) {
+                    System.out.println(string);
+                    try {
+                        Thread.sleep(2000);
+                        mSubscription.request(1);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-                   @Override
-                   public void onError(Throwable t) {
-                       System.out.println(t);
-                   }
+                @Override
+                public void onError(Throwable t) {
+                    System.out.println(t);
+                }
 
-                   @Override
-                   public void onComplete() {
-                   }
-               });
-   }
+                @Override
+                public void onComplete() {
+                }
+            });
+}
 ```
 
 运行的结果便是：

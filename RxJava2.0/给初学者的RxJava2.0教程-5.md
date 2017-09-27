@@ -20,11 +20,11 @@
 Observable<Integer> observable1 = Observable.create(new ObservableOnSubscribe<Integer>() {    
     @Override                                                                          
     public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {       
-        for (int i = 0; ; i++) {   //无限循环发事件                                                    
+        for (int i = 0; ; i++) {   //无限循环发事件
             emitter.onNext(i);                                                         
         }                                                                              
     }                                                                                  
-}).subscribeOn(Schedulers.io());    
+}).subscribeOn(Schedulers.io());
 
 Observable<String> observable2 = Observable.create(new ObservableOnSubscribe<String>() {      
     @Override                                                                          
@@ -33,12 +33,12 @@ Observable<String> observable2 = Observable.create(new ObservableOnSubscribe<Str
     }                                                                                  
 }).subscribeOn(Schedulers.io());    
 
-Observable.zip(observable1, observable2, new BiFunction<Integer, String, String>() {                 
+Observable.zip(observable1, observable2, new BiFunction<Integer, String, String>() {
     @Override                                                                          
     public String apply(Integer integer, String s) throws Exception {                  
         return integer + s;                                                            
     }                                                                                  
-}).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {                               
+}).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<String>() {
     @Override                                                                          
     public void accept(String s) throws Exception {                                    
         Log.d(TAG, s);                                                                 
@@ -119,7 +119,7 @@ public void accept(Integer integer) throws Exception {
 Observable.create(new ObservableOnSubscribe<Integer>() {                            
     @Override                                                                       
     public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {    
-        for (int i = 0; ; i++) {    //无限循环发事件                                                     
+        for (int i = 0; ; i++) {    //无限循环发事件
             emitter.onNext(i);                                                      
         }                                                                           
     }                                                                               

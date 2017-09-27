@@ -6,7 +6,7 @@
 
 在上一节中最后我们有个例子, 当上游一次性发送128个事件的时候是没有任何问题的, 一旦超过128就会抛出`MissingBackpressureException`异常, 提示你上游发太多事件了, 下游处理不过来, 那么怎么去解决呢?
 
-我们先来思考一下, 发送128个事件没有问题是因为`FLowable`内部有一个大小为128的水缸, 超过128就会装满溢出来, 那既然你水缸这么小, 那我给你换一个`大水缸`如何, 听上去很有道理的样子, 来试试:
+我们先来思考一下, 发送128个事件没有问题是因为`Flowable`内部有一个大小为128的水缸, 超过128就会装满溢出来, 那既然你水缸这么小, 那我给你换一个`大水缸`如何, 听上去很有道理的样子, 来试试:
 
 ```java
 Flowable.create(new FlowableOnSubscribe<Integer>() {
@@ -20,7 +20,6 @@ Flowable.create(new FlowableOnSubscribe<Integer>() {
         }, BackpressureStrategy.BUFFER).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -59,9 +58,9 @@ zlc.season.rxjava2demo D/TAG: emit 998
 zlc.season.rxjava2demo D/TAG: emit 999
 ```
 
-不知道大家有没有发现, 换了水缸的FLowable和Observable好像是一样的嘛...
+不知道大家有没有发现, 换了水缸的Flowable和Observable好像是一样的嘛...
 
-不错, 这时的FLowable表现出来的特性的确和Observable一模一样, 因此, 如果你像这样单纯的使用FLowable, 同样需要注意OOM的问题, 例如下面这个例子:
+不错, 这时的Flowable表现出来的特性的确和Observable一模一样, 因此, 如果你像这样单纯的使用Flowable, 同样需要注意OOM的问题, 例如下面这个例子:
 
 ```java
 Flowable.create(new FlowableOnSubscribe<Integer>() {
@@ -74,7 +73,6 @@ Flowable.create(new FlowableOnSubscribe<Integer>() {
         }, BackpressureStrategy.BUFFER).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -104,11 +102,11 @@ Flowable.create(new FlowableOnSubscribe<Integer>() {
 
 同样可以看到, 内存迅速增长, 直到最后抛出OOM. 所以说不要迷恋FLowable, 它只是个传说.
 
-> 可能有朋友也注意到了, 之前使用Observable测试的时候内存增长非常迅速, 几秒钟就OOM, 但这里增长速度却比较缓慢, 可以翻回去看之前的文章中的GIF图进行对比, 这也看出FLowable相比Observable, 在性能方面有些不足, 毕竟FLowable内部为了实现响应式拉取做了更多的操作, 性能有所丢失也是在所难免, 因此单单只是说因为FLowable是新兴产物就盲目的使用也是不对的, 也要具体分场景,
+> 可能有朋友也注意到了, 之前使用Observable测试的时候内存增长非常迅速, 几秒钟就OOM, 但这里增长速度却比较缓慢, 可以翻回去看之前的文章中的GIF图进行对比, 这也看出Flowable相比Observable, 在性能方面有些不足, 毕竟Flowable内部为了实现响应式拉取做了更多的操作, 性能有所丢失也是在所难免, 因此单单只是说因为Flowable是新兴产物就盲目的使用也是不对的, 也要具体分场景,
 
-那除了给FLowable换一个大水缸还有没有其他的办法呢, 因为更大的水缸也只是缓兵之计啊, 动不动就OOM给你看.
+那除了给Flowable换一个大水缸还有没有其他的办法呢, 因为更大的水缸也只是缓兵之计啊, 动不动就OOM给你看.
 
-想想看我们之前学习Observable的时候说到的如何解决上游发送事件太快的, 有一招叫从`数量`上取胜, 同样的FLowable中也有这种方法, 对应的就是`BackpressureStrategy.DROP`和`BackpressureStrategy.LATEST`这两种策略.
+想想看我们之前学习Observable的时候说到的如何解决上游发送事件太快的, 有一招叫从`数量`上取胜, 同样的Flowable中也有这种方法, 对应的就是`BackpressureStrategy.DROP`和`BackpressureStrategy.LATEST`这两种策略.
 
 从名字上就能猜到它俩是干啥的, Drop就是直接把存不下的事件丢弃,Latest就是只保留最新的事件, 来看看它们的实际效果吧.
 
@@ -130,7 +128,6 @@ public static void demo3() {
         }, BackpressureStrategy.DROP).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -157,7 +154,7 @@ public static void demo3() {
 
 我们仍然让上游无限循环发送事件, 这次的策略选择了Drop, 同时把Subscription保存起来, 待会我们在外部调用request(128)时, 便可以看到运行的结果.
 
-我们先来猜一下运行结果, 这里为什么request(128)呢, 因为之前不是已经说了吗, FLowable内部的默认的水缸大小为128, 因此, 它刚开始肯定会把0-127这128个事件保存起来, 然后丢弃掉其余的事件, 当我们request(128)的时候,下游便会处理掉这128个事件, 那么上游水缸中又会重新装进新的128个事件, 以此类推, 来看看运行结果吧:
+我们先来猜一下运行结果, 这里为什么request(128)呢, 因为之前不是已经说了吗, Flowable内部的默认的水缸大小为128, 因此, 它刚开始肯定会把0-127这128个事件保存起来, 然后丢弃掉其余的事件, 当我们request(128)的时候,下游便会处理掉这128个事件, 那么上游水缸中又会重新装进新的128个事件, 以此类推, 来看看运行结果吧:
 
 ![drop.gif](images/RxJava2_28.gif)
 
@@ -181,7 +178,6 @@ public static void demo4() {
         }, BackpressureStrategy.LATEST).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -231,7 +227,6 @@ public static void demo4() {
         }, BackpressureStrategy.DROP).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -268,7 +263,7 @@ public static void demo4() {
 
 从运行结果中可以看到, 除去前面128个事件, 与Drop不同, Latest总是能获取到最后最新的事件, 例如这里我们总是能获得最后一个事件9999.
 
-好了, 关于FLowable的策略我们也讲完了, 有些朋友要问了, 这些FLowable是我自己创建的, 所以我可以选择策略, 那面对有些FLowable并不是我自己创建的, 该怎么办呢? 比如RxJava中的interval操作符, 这个操作符并不是我们自己创建的, 来看下面这个例子吧:
+好了, 关于Flowable的策略我们也讲完了, 有些朋友要问了, 这些Flowable是我自己创建的, 所以我可以选择策略, 那面对有些Flowable并不是我自己创建的, 该怎么办呢? 比如RxJava中的interval操作符, 这个操作符并不是我们自己创建的, 来看下面这个例子吧:
 
 ```java
 Flowable.interval(1, TimeUnit.MICROSECONDS)
@@ -318,7 +313,7 @@ io.reactivex.exceptions.MissingBackpressureException: Can't deliver value 128 du
     at java.lang.Thread.run(Thread.java:761)
 ```
 
-一运行就抛出了`MissingBackpressureException`异常, 提醒我们发太多了, 那么怎么办呢, 这个又不是我们自己创建的FLowable啊...
+一运行就抛出了`MissingBackpressureException`异常, 提醒我们发太多了, 那么怎么办呢, 这个又不是我们自己创建的Flowable啊...
 
 别慌, 虽然不是我们自己创建的, 但是RxJava给我们提供了其他的方法:
 
@@ -364,6 +359,6 @@ Flowable.interval(1, TimeUnit.MICROSECONDS)
 
 其余的我就不一一列举了.
 
-好了, 今天的教程就到这里吧, 这一节我们学习了如何使用内置的BackpressureStrategy来解决上下游事件速率不均衡的问题. 这些策略其实之前我们将Observable的时候也提到过, 其实大差不差, 只要理解了为什么会上游发事件太快, 下游处理太慢这一点, 你就好处理了, FLowable无非就是给你封装好了, 确实对初学者友好一点, 但是很多初学者往往只知道How, 却不知道Why, 最重要的其实是知道why, 而不是How.
+好了, 今天的教程就到这里吧, 这一节我们学习了如何使用内置的BackpressureStrategy来解决上下游事件速率不均衡的问题. 这些策略其实之前我们将Observable的时候也提到过, 其实大差不差, 只要理解了为什么会上游发事件太快, 下游处理太慢这一点, 你就好处理了, Flowable无非就是给你封装好了, 确实对初学者友好一点, 但是很多初学者往往只知道How, 却不知道Why, 最重要的其实是知道why, 而不是How.
 
-(其余的教程大多数到这里就结束了, 但是, 你以为FLowable就这么点东西吗, 骚年, Too young too simple, sometimes naive! 这仅仅是开始, 真正牛逼的还没来呢. 敬请关注下一节, 下节见 ! )
+(其余的教程大多数到这里就结束了, 但是, 你以为Flowable就这么点东西吗, 骚年, Too young too simple, sometimes naive! 这仅仅是开始, 真正牛逼的还没来呢. 敬请关注下一节, 下节见 ! )

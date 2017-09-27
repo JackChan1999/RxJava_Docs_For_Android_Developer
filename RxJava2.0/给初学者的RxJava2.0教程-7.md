@@ -28,7 +28,6 @@ Flowable<Integer> upstream = Flowable.create(new FlowableOnSubscribe<Integer>() 
         }, BackpressureStrategy.ERROR); //增加了一个参数
 
         Subscriber<Integer> downstream = new Subscriber<Integer>() {
-
             @Override
             public void onSubscribe(Subscription s) {
                 Log.d(TAG, "onSubscribe");
@@ -38,7 +37,6 @@ Flowable<Integer> upstream = Flowable.create(new FlowableOnSubscribe<Integer>() 
             @Override
             public void onNext(Integer integer) {
                 Log.d(TAG, "onNext: " + integer);
-
             }
 
             @Override
@@ -95,7 +93,6 @@ D/TAG: onComplete
                 emitter.onComplete();
             }
         }, BackpressureStrategy.ERROR).subscribe(new Subscriber<Integer>() {
-
             @Override
             public void onSubscribe(Subscription s) {
                 Log.d(TAG, "onSubscribe");
@@ -104,7 +101,6 @@ D/TAG: onComplete
             @Override
             public void onNext(Integer integer) {
                 Log.d(TAG, "onNext: " + integer);
-
             }
 
             @Override
@@ -169,7 +165,6 @@ Flowable.create(new FlowableOnSubscribe<Integer>() {
         }, BackpressureStrategy.ERROR).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -242,7 +237,6 @@ public static void demo3() {
     }, BackpressureStrategy.ERROR).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Subscriber<Integer>() {
-
                 @Override
                 public void onSubscribe(Subscription s) {
                     Log.d(TAG, "onSubscribe");
@@ -287,7 +281,6 @@ Flowable.create(new FlowableOnSubscribe<Integer>() {
         }, BackpressureStrategy.ERROR).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Integer>() {
-
                     @Override
                     public void onSubscribe(Subscription s) {
                         Log.d(TAG, "onSubscribe");
@@ -353,6 +346,6 @@ io.reactivex.exceptions.MissingBackpressureException: create: could not emit val
 
 注意这里我们是把上游发送的事件全部都存进了水缸里, 下游一个也没有消费, 所以就溢出了, 如果下游去消费了事件, `可能`就不会导致水缸溢出来了. 这里我们说的是可能不会, 这也很好理解, 比如刚才这个例子上游发了129个事件, 下游只要快速的消费了一个事件, 就不会溢出了, 但如果下游过了十秒钟再来消费一个, 那肯定早就溢出了.
 
-好了, 今天的教程就到这里了, 下一节我们将会更加深入的去学习FLowable, 敬请期待.
+好了, 今天的教程就到这里了, 下一节我们将会更加深入的去学习Flowable, 敬请期待.
 
 (哈哈, 给我的RxDownload打个广告: RxDownload是一个基于RxJava的多线程+断点续传的下载工具, 感兴趣的来GitHub点个star吧. 电梯直达->[戳这里](https://github.com/ssseasonnn/RxDownload) )
