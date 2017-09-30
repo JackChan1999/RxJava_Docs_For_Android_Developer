@@ -1,3 +1,5 @@
+# RxJava与Retrofit结合的最佳实践
+
 > 原文链接：http://gank.io/post/56e80c2c677659311bed9841
 
 ## 前言
@@ -22,7 +24,7 @@ RxJava和Retrofit也火了一段时间了，不过最近一直在学习ReactNati
 4. 如何取消一个Http请求 -- 观察者之间的对决，Oberver VS Subscriber
 5. 一个需要ProgressDialog的Subscriber该有的样子
 
-## 1.RxJava如何与Retrofit结合
+## 1. RxJava如何与Retrofit结合
 
 ### 1.1 基本页面
 
@@ -43,12 +45,11 @@ dependencies {
 }
 ```
 
-也就是说本文是基于RxJava1.1.0和Retrofit 2.0.0-beta4来进行的。
-添加rxandroid是因为rxjava中的线程问题。
+也就是说本文是基于RxJava1.1.0和Retrofit 2.0.0-beta4来进行的。添加rxandroid是因为rxjava中的线程问题。
 
- 下面先搭建一个基本的页面，页面很简单，先来看文件目录结构
+下面先搭建一个基本的页面，页面很简单，先来看文件目录结构
 
- ![目录结构](images/RxJava_16.jpg)
+![目录结构](images/RxJava_16.jpg)
 
 **activity_main.xml**的代码如下：
 
@@ -182,8 +183,7 @@ private void getMovie(){
 
 我们可以封装创建Retrofit和service部分的代码，然后Activity用创建一个Callback作为参数给Call，这样Activity中只关注请求的结果，而且Call有cancel方法可以取消一个请求，好像没Rxjava什么事了，我觉得可以写到这就下班了
 
-接下来我们要面对的问题是这样的
-如果我的Http返回数据是一个统一的格式，例如
+接下来我们要面对的问题是这样的，如果我的Http返回数据是一个统一的格式，例如
 
 ```json
 {
@@ -339,7 +339,7 @@ public class HttpMethods {
 }
 ```
 
-用一个单例来封装该对象，在构造方法中创建Retrofit和对应的Service。
+用一个单例来封装该对象，在构造方法中创建Retrofit和对应的Service。        
 如果需要访问不同的基地址，那么你可能需要创建多个Retrofit对象，或者干脆根据不同的基地址封装不同的HttpMethod类。
 
 我们回头再来看MainActivity中的**getMovie**方法：
@@ -374,14 +374,13 @@ private void getMovie(){
 
 选择Tag -> step3
 
-## 2.相同格式的Http请求数据该如何封装
+## 2. 相同格式的Http请求数据该如何封装
 
-第二部分和第三部分我参考了知乎上的一个问答：
-[RxJava+Retrofit，在联网返回后如何先进行统一的判断？](https://www.zhihu.com/question/39182019)
+第二部分和第三部分我参考了知乎上的一个问答：[RxJava+Retrofit，在联网返回后如何先进行统一的判断？](https://www.zhihu.com/question/39182019)
+
 不过没有完整的示例，所以在这写一个完整的示例出来。
 
-这个段落我们来聊一下有些Http服务返回一个固定格式的数据的问题。
-例如：
+这个段落我们来聊一下有些Http服务返回一个固定格式的数据的问题。例如：
 
 ```json
 {
@@ -392,6 +391,7 @@ private void getMovie(){
 ```
 
 大部分的Http服务可能都是这样设置，resultCode和resultMessage的内容相对比较稳定，而data的内容变化多端，72变都不一定够变的，有可能是个User对象，也有可能是个订单对象，还有可能是个订单列表。
+
 按照我们之前的用法，使用Gson转型需要我们在创建subscriber对象是指定返回值类型，如果我们对不同的返回值进行封装的话，那可能就要有上百个Entity了，看着明明是很清晰的结构，却因为data的不确定性无奈了起来。
 
 少年，不必烦恼，来来来~ 老衲赐你宝典葵花，老衲就是练了这个才出家。。。
@@ -443,7 +443,7 @@ Observable<HttpResult<List<Subject>>>
 
 选择Tag -> step4
 
-## 3.相同格式的Http请求数据统一进行预处理
+## 3. 相同格式的Http请求数据统一进行预处理
 
 既然我们有了相同的返回格式，那么我们可能就需要在获得数据之后进行一个统一的预处理。
 
@@ -501,7 +501,7 @@ public void getTopMovie(Subscriber<List<Subject>> subscriber, int start, int cou
 }
 ```
 
-由于HttpResult中的泛型T就是我们希望传递给subscriber的数据类型，而数据可以通过httpResult的getData方法获得，这样我们就处理了泛型问题，错误处理问题，还有将请求数据部分剥离出来给subscriber
+由于HttpResult中的泛型T就是我们希望传递给subscriber的数据类型，而数据可以通过httpResult的getData方法获得，这样我们就处理了泛型问题，错误处理问题，还有将请求数据部分剥离出来给subscriber。
 
 这样我们只需要关注Data数据的类型，而不必在关心整个过程了。
 
@@ -530,15 +530,15 @@ List<Subject>
 
 代码中我是用豆瓣数据模拟了HttpResult中的resultCode和resultMessage，与文档中的代码略有出入。
 
-## 4.如何取消一个Http请求 -- 观察者之间的对决，Observer VS Subscriber
+## 4. 如何取消一个Http请求 -- 观察者之间的对决，Observer VS Subscriber
 
 ### 4.1 取消一个Http请求
+
 这一部分我们来聊一下关于取消Http请求的事情，已经Oberver和Subscriber这两个体位我们哪个更容易给我们G点。
 
-如果没有使用Rxjava，那么Service返回的是一个Call，而这个Call对象有一个cancel方法可以用来取消Http请求。那么用了Rxjava之后，如何来取消一个请求呢？因为返回值是一个Observable。我们能做的视乎之有解除对Observable对象的订阅，其他的什么也做不了。
+如果没有使用Rxjava，那么Service返回的是一个Call，而这个Call对象有一个cancel方法可以用来取消Http请求。那么用了Rxjava之后，如何来取消一个请求呢？因为返回值是一个Observable。我们能做的似乎只有解除对Observable对象的订阅，其他的什么也做不了。
 
-好在Retrofit已经帮我们考虑到了这一点。
-答案在RxJavaCallAdapterFactory这个类的源码中可以找到
+好在Retrofit已经帮我们考虑到了这一点。答案在RxJavaCallAdapterFactory这个类的源码中可以找到
 
 ```java
 static final class CallOnSubscribe<T> implements Observable.OnSubscribe<Response<T>> {
@@ -587,7 +587,7 @@ public static Subscription create(final Action0 unsubscribe) {
 }
 ```
 
-利用了一个BooleanSubscription类来创建一个Subscription，如果你点进去看BooleanSubscription.create方法一切就清晰了，当接触绑定的时候，subscriber会调用Subscription的unsubscribe方法，然后触发创建Subscription时候的传递进来的Action0的call方法。RxJavaCallAdapterFactory帮我们给subscriber添加的是call.cancel()，
+利用了一个BooleanSubscription类来创建一个Subscription，如果你点进去看BooleanSubscription.create方法一切就清晰了，当解除绑定的时候，subscriber会调用Subscription的unsubscribe方法，然后触发创建Subscription时候的传递进来的Action0的call方法。RxJavaCallAdapterFactory帮我们给subscriber添加的是call.cancel()，
 
 总结起来就是说，我们在Activity或者Fragment中创建subscriber对象，想要取消请求的时候调用subscriber的unsubscribe方法就可以了。
 
@@ -631,11 +631,11 @@ public final Subscription subscribe(final Observer<? super T> observer) {
 
 >问题1 无法取消，因为Observer没有unsubscribe方法
 
->问题2 没有onStart方法 这个一会聊
+>问题2 没有onStart方法，这个一会聊
 
 这两个问题是很痛苦的。所以，为了后面更好的高潮，我们还是选择用Subscriber。
 
-## 5.一个需要ProgressDialog的Subscriber该有的样子
+## 5. 一个需要ProgressDialog的Subscriber该有的样子
 
 我们希望有一个Subscriber在我们每次发送请求的时候能够弹出一个ProgressDialog，然后在请求接受的时候让这个ProgressDialog消失，同时在我们取消这个ProgressDialog的同时能够取消当前的请求，而我们只需要处理里面的数据就可以了。
 
@@ -645,8 +645,8 @@ Subscriber给我们提供了onStart、onNext、onError、onCompleted四个方法
 
 其中只有onNext方法返回了数据，那我们自然希望能够在onNext里面处理数据相关的逻辑。
 
-**onStart**方法我们用来启动一个ProgressDialog。
-**onError**方法我们集中处理错误，同时也停止ProgressDialog
+**onStart**方法我们用来启动一个ProgressDialog。        
+**onError**方法我们集中处理错误，同时也停止ProgressDialog       
 **onComplated**方法里面停止ProgressDialog
 
 其中我们需要解决两个问题
@@ -657,7 +657,7 @@ Subscriber给我们提供了onStart、onNext、onError、onCompleted四个方法
 
 我们先来解决问题1
 
-### 5.1处理onNext
+### 5.1 处理onNext
 
 我们希望这里能够让Activity或者Fragment自己处理onNext之后的逻辑，很自然的我们想到了用接口。问题还是泛型的问题，这里面我们必须指定明确的类型。所以接口还是需要泛型。
 
@@ -745,9 +745,9 @@ private void getMovie(){
 
 选择Tag -> step6
 
-### 5.2处理ProgressDialog
+### 5.2 处理ProgressDialog
 
-我们希望当cancel掉ProgressDialog的时候，能够取消订阅，也就取消了当前的Http请求。
+我们希望当cancel掉ProgressDialog的时候，能够取消订阅，也就取消了当前的Http请求。        
 所以我们先来创建个接口来处理这件事情。
 
 ```java
@@ -831,8 +831,7 @@ public class ProgressDialogHandler extends Handler {
 }
 ```
 
-Handler接收两个消息来控制显示Dialog还是关闭Dialog。
-创建Handler的时候我们需要传入ProgressCancelListener的对象实例。
+Handler接收两个消息来控制显示Dialog还是关闭Dialog。创建Handler的时候我们需要传入ProgressCancelListener的对象实例。
 
 最后贴出ProgressSubscriber的完整代码：
 
@@ -897,6 +896,7 @@ public class ProgressSubscriber<T> extends Subscriber<T> implements ProgressCanc
 目前为止，就封装完毕了。以上是我在用Rxjava和Retrofit过程中踩过的一些坑，最后整合出来的，由于没有在实际的项目中跑过，有问题的话希望能够提出来大家讨论一下，拍砖也欢迎。
 
 现在我们再写一个新的网络请求，步骤是这样的：
+
 1. 在**Service**中定义一个新的方法。
 2. 在**HttpMethods**封装对应的请求（代码基本可以copy）
 3. 创建一个**SubscriberOnNextListener**处理请求数据并刷新UI。
@@ -946,9 +946,9 @@ private void toSubscribe(Observable o, Subscriber s){
 }
 ```
 
-这样的情况还能不能继续使用这样的框架呢？
-我的解决方法是封装一个类，把user和orderArray作为类的属性。
-但是如果你的服务器一会data本身是一个完整的user数据，一会又是这样：`"data": {"user": {}, "orderArray": []}`
+这样的情况还能不能继续使用这样的框架呢？        
+我的解决方法是封装一个类，把user和orderArray作为类的属性。        
+但是如果你的服务器一会data本身是一个完整的user数据，一会又是这样：`"data": {"user": {}, "orderArray": []}`       
 那我觉得你有必要跟你的服务端好好聊聊了，请他吃顿饭和顿酒，大不了献出菊花就是了。
 
 但是如果服务已经上线了！！！
