@@ -1,5 +1,7 @@
 ## RxJava 1.0
 
+观察者模式 + Lambda + Stream Api（操作符）+ 调度器
+
 ![](RxJava1.0/images/RxJava.png)
 
 - Observable

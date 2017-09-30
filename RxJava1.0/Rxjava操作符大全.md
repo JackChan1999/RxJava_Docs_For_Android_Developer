@@ -23,7 +23,7 @@
 | 操作符                                      | 功能描述                                     |
 | ---------------------------------------- | ---------------------------------------- |
 | map()                                    | 对序列的每一项都应用一个函数来变换Observable发射的数据序列       |
-| flatMap(), concatMap(), flatMapIterable() | 将Observable发射的数据集合变换为Observables集合，然后将这些Observable发射的数据平坦化的放进一个单独的 |
+| flatMap(), concatMap(), flatMapIterable() | 扁平映射，将Observable发射的数据集合变换为Observables集合，然后将这些Observable发射的数据平坦化的放进一个单独的Observable，可以认为是一个将嵌套的数据结构展开的过程。 |
 | switchMap()                              | 将Observable发射的数据集合变换为Observables集合，然后只发射这些Observables最近发射的数据 |
 | scan()                                   | 对Observable发射的每一项数据应用一个函数，然后按顺序依次发射每一个值  |
 | groupBy()                                | 将Observable分拆为Observable集合，将原始Observable发射的数据按Key分组，每一个Observable发射一组不同的数据 |

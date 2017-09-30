@@ -67,6 +67,7 @@ https://www.gitbook.com/book/alleniverson/rxdocs/welcome
     * [不该使用 RxJava 的一些情况](https://alleniverson.gitbooks.io/rxjava-docs-for-android-developer/content/RxJava系列教程\25.不该使用%20RxJava%20的一些情况.html)
     * [RxJava 常见的错误用法](https://alleniverson.gitbooks.io/rxjava-docs-for-android-developer/content/RxJava系列教程\26.RxJava%20常见的错误用法.html)
     * [RxJava Android 开发全家桶](https://alleniverson.gitbooks.io/rxjava-docs-for-android-developer/content/RxJava系列教程\27.RxJava%20Android%20开发全家桶.html)
+* [Rxjava操作符大全](https://alleniverson.gitbooks.io/rxjava-docs-for-android-developer/content/RxJava1.0/RxJava1.0/Rxjava操作符大全.html)
 
 ## 关注我
 
