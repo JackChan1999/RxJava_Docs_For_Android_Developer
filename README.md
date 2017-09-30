@@ -14,6 +14,14 @@ https://www.gitbook.com/book/alleniverson/rxjava-docs-for-android-developer/deta
 
 https://www.gitbook.com/book/alleniverson/rxdocs/welcome
 
+## RxJava 视频教程
+
+![](assets/rxjava_vedio_2.png)
+
+![](assets/rxjava_vedio.png)
+
+![](assets/rxjava_vedio_3.png)
+
 ## 目录
 
 * [给 Android 开发者的 RxJava 详解](https://alleniverson.gitbooks.io/rxjava-docs-for-android-developer/content/RxJava1.0/给Android开发者的RxJava详解.html)
