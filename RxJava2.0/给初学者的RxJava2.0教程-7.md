@@ -8,7 +8,7 @@
 
 我们还是以两根水管举例子:
 
-![prepare.png](images/RxJava2_25.gif)
+![prepare.png](images/RxJava2_25.png)
 
 之前我们所的上游和下游分别是`Observable`和`Observer`, 这次不一样的是上游变成了`Flowable`, 下游变成了`Subscriber`, 但是水管之间的连接还是通过`subscribe()`, 我们来看看最基本的用法吧:
 
@@ -63,7 +63,7 @@ D/TAG: emit 2
 D/TAG: onNext: 2     
 D/TAG: emit 3        
 D/TAG: onNext: 3     
-D/TAG: emit complete 
+D/TAG: emit complete
 D/TAG: onComplete
 ```
 
@@ -120,7 +120,7 @@ D/TAG: onComplete
 ```
 zlc.season.rxjava2demo D/TAG: onSubscribe
 zlc.season.rxjava2demo D/TAG: emit 1
-zlc.season.rxjava2demo W/TAG: onError: 
+zlc.season.rxjava2demo W/TAG: onError:
 io.reactivex.exceptions.MissingBackpressureException: create: could not emit value due to lack of requests
     at io.reactivex.internal.operators.flowable.FlowableCreate$ErrorAsyncEmitter.onOverflow(FlowableCreate.java:411)
     at io.reactivex.internal.operators.flowable.FlowableCreate$NoOverflowBaseAsyncEmitter.onNext(FlowableCreate.java:377)
@@ -263,7 +263,7 @@ public static void demo3() {
 
 这里我们把Subscription保存起来, 在界面上增加了一个按钮, 点击一次就调用`Subscription.request(1)`, 来看看运行结果:
 
-![request.gif](images/RxJava2_26.gif)
+![request.gif](images/RxJava2_25.gif)
 
 结果似乎像那么回事, 上游发送了四个事件保存到了水缸里, 下游每request一个, 就接收一个进行处理.
 
@@ -325,7 +325,7 @@ zlc.season.rxjava2demo D/TAG: emit 0
 zlc.season.rxjava2demo D/TAG: emit 126
 zlc.season.rxjava2demo D/TAG: emit 127
 zlc.season.rxjava2demo D/TAG: emit 128  //这是第129个事件
-zlc.season.rxjava2demo W/TAG: onError: 
+zlc.season.rxjava2demo W/TAG: onError:
 io.reactivex.exceptions.MissingBackpressureException: create: could not emit value due to lack of requests
     at io.reactivex.internal.operators.flowable.FlowableCreate$ErrorAsyncEmitter.onOverflow(FlowableCreate.java:411)
     at io.reactivex.internal.operators.flowable.FlowableCreate$NoOverflowBaseAsyncEmitter.onNext(FlowableCreate.java:377)

@@ -98,7 +98,7 @@ Flowable.create(new FlowableOnSubscribe<Integer>() {
 
 按照我们以前学习Observable一样, 让上游无限循环发送事件, 下游一个也不去处理, 来看看运行结果吧:
 
-![flowable.gif](images/RxJava2_27.gif)
+![flowable.gif](images/RxJava2_26.gif)
 
 同样可以看到, 内存迅速增长, 直到最后抛出OOM. 所以说不要迷恋FLowable, 它只是个传说.
 
@@ -156,7 +156,7 @@ public static void demo3() {
 
 我们先来猜一下运行结果, 这里为什么request(128)呢, 因为之前不是已经说了吗, Flowable内部的默认的水缸大小为128, 因此, 它刚开始肯定会把0-127这128个事件保存起来, 然后丢弃掉其余的事件, 当我们request(128)的时候,下游便会处理掉这128个事件, 那么上游水缸中又会重新装进新的128个事件, 以此类推, 来看看运行结果吧:
 
-![drop.gif](images/RxJava2_28.gif)
+![drop.gif](images/RxJava2_27.gif)
 
 从运行结果中我们看到的确是如此, 第一次request的时候, 下游的确收到的是0-127这128个事件, 但第二次request的时候就不确定了, 因为上游一直在发送事件. 内存占用也很正常, drop的作用相信大家也很清楚了.
 
@@ -204,7 +204,7 @@ public static void demo4() {
 
 同样的, 上游无限循环发送事件, 策略选择Latest, 同时把Subscription保存起来, 方便在外部调用request(128).来看看这次的运行结果:
 
-![latest.gif](images/RxJava2_29.gif)
+![latest.gif](images/RxJava2_28.gif)
 
 诶, 看上去好像和Drop差不多啊, Latest也首先保存了0-127这128个事件, 等下游把这128个事件处理了之后才进行之后的处理, 光从这里没有看出有任何区别啊...
 
@@ -253,13 +253,13 @@ public static void demo4() {
 
 这段代码和之前有两点不同, 一是上游只发送了10000个事件, 二是下游在一开始就立马处理掉了128个事件, 然后我们在外部再调用request(128)试试, 来看看运行结果:
 
-![drop_1.gif](images/RxJava2_30.gif)
+![drop_1.gif](images/RxJava2_29.gif)
 
 这次可以看到, 一开始下游就处理掉了128个事件, 当我们再次request的时候, 只得到了第3317的事件, 后面的事件直接被抛弃了.
 
 再来看看Latest的运行结果吧:
 
-![latest_1.gif](images/RxJava2_31.png)
+![latest_1.gif](images/RxJava2_30.gif)
 
 从运行结果中可以看到, 除去前面128个事件, 与Drop不同, Latest总是能获取到最后最新的事件, 例如这里我们总是能获得最后一个事件9999.
 
@@ -302,7 +302,7 @@ interval操作符发送Long型的事件, 从0开始, 每隔指定的时间就把
 
 ```
 zlc.season.rxjava2demo D/TAG: onSubscribe
-zlc.season.rxjava2demo W/TAG: onError: 
+zlc.season.rxjava2demo W/TAG: onError:
 io.reactivex.exceptions.MissingBackpressureException: Can't deliver value 128 due to lack of requests
     at io.reactivex.internal.operators.flowable.FlowableInterval$IntervalSubscriber.run(FlowableInterval.java:87)
     at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:428)

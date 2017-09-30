@@ -18,6 +18,7 @@
   - onError()
   - Subscriber
     - onStart()
+    - request()
 - Subscription
 
   - unsubscribe()
@@ -43,12 +44,15 @@
 
 
 - ObservableSource
+- Disposable
+  - dispose()
 
 
 - CompositeDisposable
   - add()
   - clear()
 - BiFunction
+- Consumer
 - Flowable
 - Backpressure
 - BackpressureStrategy

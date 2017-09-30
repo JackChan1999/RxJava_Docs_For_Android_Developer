@@ -140,7 +140,7 @@ ObservableEmitter： Emitter是发射器的意思，那就很好猜了，这个�
 | 发送onComplete事件 | ![RxJava](images/RxJava2_03.png) |
 | 发送onError事件    | ![RxJava](images/RxJava2_04.png) |
 
-介绍了ObservableEmitter, 接下来介绍Disposable, 这个单词的字面意思是一次性用品,用完即可丢弃的. 那么在RxJava中怎么去理解它呢, 对应于上面的水管的例子, 我们可以把它理解成两根管道之间的一个机关, 当调用它的`dispose()`方法时, 它就会将两根管道切断, 从而导致下游收不到事件
+介绍了ObservableEmitter, 接下来介绍Disposable, 这个单词的字面意思是一次性用品，用完即可丢弃的. 那么在RxJava中怎么去理解它呢, 对应于上面的水管的例子, 我们可以把它理解成两根管道之间的一个机关, 当调用它的`dispose()`方法时, 它就会将两根管道切断, 从而导致下游收不到事件
 
 > 注意: 调用dispose()并不会导致上游不再继续发送事件, 上游会继续发送剩余的事件.
 
